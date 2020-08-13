@@ -6,13 +6,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://cheungkin24.github.io">
-  <title>Archives: 2020 | Hexo</title>
+  <title>this解析 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="https://cheungkin24.github.io/archives/2020/index.html">
+  <meta name="description" content="调用位置在Javascript中，this的指向不是在定义时决定的，而是在调用时决定的。而调用时又根据不同情况和优先级决定this的指向，因此分析调用栈，才是找到this指向的关键 默认绑定函数直接执行，如果不使用严格模式，this会自动绑定到全局对象，如果不是，this就会被绑定到undefined，其中函数在严格模式被调用，被不影响默认绑定，只有函数运行在严格模式时，this才无法绑定到全局变">
+<meta property="og:type" content="article">
+<meta property="og:title" content="this解析">
+<meta property="og:url" content="https://cheungkin24.github.io/2020/05/04/this%E8%A7%A3%E6%9E%90/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="调用位置在Javascript中，this的指向不是在定义时决定的，而是在调用时决定的。而调用时又根据不同情况和优先级决定this的指向，因此分析调用栈，才是找到this指向的关键 默认绑定函数直接执行，如果不使用严格模式，this会自动绑定到全局对象，如果不是，this就会被绑定到undefined，其中函数在严格模式被调用，被不影响默认绑定，只有函数运行在严格模式时，this才无法绑定到全局变">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-08-13T05:27:57.541Z">
 <meta property="article:author" content="cheungkin">
 <meta name="twitter:card" content="summary">
   
@@ -150,49 +154,185 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-this解析" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/05/04/this%E8%A7%A3%E6%9E%90/" class="archive-article-date">
-  	<time datetime="2020-05-03T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-05-04</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/05/04/this%E8%A7%A3%E6%9E%90/">this解析</a>
+    <h1 class="article-title" itemprop="name">
+      this解析
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
+        
+        <a href="/2020/05/04/this%E8%A7%A3%E6%9E%90/" class="archive-article-date">
+  	<time datetime="2020-05-03T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-05-04</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="调用位置"><a href="#调用位置" class="headerlink" title="调用位置"></a>调用位置</h2><p>在Javascript中，this的指向不是在定义时决定的，而是在调用时决定的。而调用时又根据不同情况和优先级决定this的指向，因此分析调用栈，才是找到this指向的关键</p>
+<h2 id="默认绑定"><a href="#默认绑定" class="headerlink" title="默认绑定"></a>默认绑定</h2><p>函数直接执行，如果不使用严格模式，this会自动绑定到全局对象，如果不是，this就会被绑定到undefined，其中函数在严格模式被调用，被不影响默认绑定，只有函数运行在严格模式时，this才无法绑定到全局变量</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">	"use strict"</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="keyword">this</span>) <span class="comment">// undefined</span></span><br><span class="line">&#125;</span><br><span class="line">bar()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="keyword">this</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">	"use strict"</span></span><br><span class="line">  foo() <span class="comment">// window</span></span><br><span class="line">&#125;)()</span><br></pre></td></tr></table></figure>
+<h2 id="隐式绑定"><a href="#隐式绑定" class="headerlink" title="隐式绑定"></a>隐式绑定</h2><p>隐式绑定会把调用函数的this绑定到这个上下文对象，同时只有最后一层的调用在起作用</p>
+<h2 id="隐式丢失"><a href="#隐式丢失" class="headerlink" title="隐式丢失"></a>隐式丢失</h2><p>通常出现在把函数当参数传递，执行这个实参时，因为没有了隐式绑定，所以函数的this就由默认规则决定</p>
+<h2 id="显式绑定"><a href="#显式绑定" class="headerlink" title="显式绑定"></a>显式绑定</h2><p>使用Function.prototype.call和Function.prototype.apply或者Function.prototype.bind强制把this绑定到对象上</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span> (<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="keyword">this</span>.name, a, b)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> obj = &#123;</span><br><span class="line">  name: <span class="string">'obj'</span></span><br><span class="line">&#125;</span><br><span class="line">bar.apply(obj, [<span class="number">1</span>, <span class="number">2</span>]) <span class="comment">// obj, 1, 2</span></span><br><span class="line">bar.call(obj, <span class="number">1</span>, <span class="number">2</span>) <span class="comment">// obj, 1, 2</span></span><br></pre></td></tr></table></figure>
+<h2 id="硬绑定"><a href="#硬绑定" class="headerlink" title="硬绑定"></a>硬绑定</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bind</span>(<span class="params">fn, obj</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> fn.apply(obj, <span class="built_in">arguments</span>)</span><br><span class="line">    <span class="comment">// return fn.call(obj, ...arguments)</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="keyword">this</span>.num, num)</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.num + num</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> obj = &#123;</span><br><span class="line">	num: <span class="number">0</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> bindFoo = bind(foo, obj)</span><br><span class="line"><span class="keyword">const</span> result = bindFoo(<span class="number">5</span>)</span><br><span class="line"><span class="built_in">console</span>.log(result)</span><br></pre></td></tr></table></figure>
 
+
+<h2 id="Api调用的上下文"><a href="#Api调用的上下文" class="headerlink" title="Api调用的上下文"></a>Api调用的上下文</h2><p>forEach的第二个参数就是上下文</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.myForEach = <span class="function"><span class="keyword">function</span> (<span class="params">fn, obj</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.length; i++) &#123;</span><br><span class="line">    fn.apply(obj, <span class="keyword">this</span>[i], i, <span class="keyword">this</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="new绑定"><a href="#new绑定" class="headerlink" title="new绑定"></a>new绑定</h2><p>并不存在所谓的构造函数，只有对于函数的构造调用，使用new来调用函数，会自动执行一下步骤</p>
+<ul>
+<li>创建一个全新的对象</li>
+<li>这个新对象会被执行[[prototype]]连接</li>
+<li>这个对象会绑定到函数调用的this</li>
+<li>如果函数没有返回其他对象，那么函数会自动返回这个新对象</li>
+</ul>
+<h2 id="优先级"><a href="#优先级" class="headerlink" title="优先级"></a>优先级</h2><p>隐式绑定 &lt; 显式绑定 &lt; new绑定</p>
+<h2 id="箭头函数的this"><a href="#箭头函数的this" class="headerlink" title="箭头函数的this"></a>箭头函数的this</h2><p>箭头函数是没有自己的this和arguments的，它的this是根据外层函数或者全局的作用域来决定</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> arrow = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="keyword">this</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">	arrow()</span><br><span class="line">&#125;</span><br><span class="line">foo()</span><br><span class="line"><span class="comment">// 相当于</span></span><br><span class="line"><span class="comment">// function foo() &#123;</span></span><br><span class="line"><span class="comment">//	const that = this</span></span><br><span class="line"><span class="comment">//  function () &#123;</span></span><br><span class="line"><span class="comment">//  	console.log(that)</span></span><br><span class="line"><span class="comment">//  &#125;</span></span><br><span class="line"><span class="comment">//&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="手写实现"><a href="#手写实现" class="headerlink" title="手写实现"></a>手写实现</h2><ol>
+<li>手写实现call，bind<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.myApply = <span class="function"><span class="keyword">function</span> (<span class="params">obj, argsArr</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> obj = obj || <span class="built_in">window</span></span><br><span class="line">  obj.p = <span class="keyword">this</span>;</span><br><span class="line">  <span class="keyword">if</span> (argsArr) &#123;</span><br><span class="line">    <span class="keyword">return</span> obj.p(...argsArr);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  	<span class="keyword">return</span> obj.p()</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">delete</span> obj.p;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">const</span> obj = &#123; <span class="attr">name</span>: <span class="string">"obj"</span> &#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">a, b, c</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="keyword">this</span>, a, b, c);</span><br><span class="line">&#125;</span><br><span class="line">foo.myApply(obj, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>); <span class="comment">// &#123;name: "123", p: ƒ&#125; 1 2 3</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 高级：支持 new，例如 new (funcA.bind(thisArg, args))</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bind</span>(<span class="params">asThis</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> slice = <span class="built_in">Array</span>.prototype.slice;</span><br><span class="line">  <span class="keyword">var</span> args1 = slice.call(<span class="built_in">arguments</span>, <span class="number">1</span>);</span><br><span class="line">  <span class="keyword">var</span> fn = <span class="keyword">this</span>;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> fn !== <span class="string">"function"</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">"Must accept function"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">resultFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> args2 = slice.call(<span class="built_in">arguments</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">return</span> fn.apply(</span><br><span class="line">      resultFn.prototype.isPrototypeOf(<span class="keyword">this</span>) ? <span class="keyword">this</span> : asThis, <span class="comment">// 用来绑定 this</span></span><br><span class="line">      args1.concat(args2)</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">  resultFn.prototype = fn.prototype;</span><br><span class="line">  <span class="keyword">return</span> resultFn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ol>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=https://cheungkin24.github.io/2020/05/04/this%E8%A7%A3%E6%9E%90/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2019/04/05/%E5%85%B3%E4%BA%8Einstanceof/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">关于instanceof</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -215,8 +355,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
